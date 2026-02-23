@@ -5,95 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Super Mario Level 1-1</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background: skyblue;
-        }
-        canvas {
-            display: block;
-            background: #5c94fc;
-        }
-        #hud {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            font-size: 1.5em;
-        }
+        body { margin: 0; overflow: hidden; }
+        canvas { background: #87CEEB; display: block; margin: 0 auto; }
+        .coin { color: gold; font-size: 30px; }
     </style>
 </head>
 <body>
-    <div id="hud">
-        <div>Score: <span id="score">0</span></div>
-        <div>Coins: <span id="coins">0</span></div>
-        <div>Time: <span id="time">60</span></div>
-    </div>
     <canvas id="gameCanvas" width="800" height="400"></canvas>
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Game Variables
-        let score = 0;
-        let coins = 0;
-        let timeLeft = 60;
-        let player = { x: 50, y: 350, width: 30, height: 30, gravity: 0.5, dy: 0 };
-        let platforms = [
-            { x: 0, y: 380, width: 800, height: 20 },
-            { x: 200, y: 300, width: 100, height: 20 },
-            { x: 400, y: 250, width: 100, height: 20 },
-            { x: 600, y: 350, width: 100, height: 20 }
+        const player = {
+            x: 50,
+            y: 320,
+            width: 30,
+            height: 30,
+            gravity: 0.5,
+            jumpStrength: -10,
+            velocityY: 0,
+            isJumping: false,
+            // Player emoji
+            draw: function() {
+                ctx.fillText('👾', this.x, this.y + this.height);
+            }
+        };
+
+        const coins = [
+            { x: 200, y: 300 },
+            { x: 300, y: 300 },
+            { x: 400, y: 300 }
         ];
 
-        // Game Loop
-        function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(player.x, player.y, player.width, player.height);
-            updatePlayer();
-            drawPlatforms();
-            updateHUD();
-            if (timeLeft > 0) {
-                requestAnimationFrame(gameLoop);
-            } else {
-                ctx.fillStyle = 'red';
-                ctx.font = '40px Arial';
-                ctx.fillText('Game Over', 300, 200);
-            }
-        }
+        let score = 0;
 
-        function updatePlayer() {
-            player.dy += player.gravity;
-            player.y += player.dy;
-            if (player.y + player.height >= canvas.height) {
-                player.y = canvas.height - player.height;
-                player.dy = 0;
-            } else if (player.y < 0) {
-                player.y = 0;
-                player.dy = 0;
-            }
-        }
-
-        function drawPlatforms() {
-            ctx.fillStyle = 'green';
-            platforms.forEach(platform => {
-                ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+        function drawCoins() {
+            coins.forEach(coin => {
+                ctx.fillText('💰', coin.x, coin.y);
             });
         }
 
-        function updateHUD() {
-            document.getElementById('score').innerText = score;
-            document.getElementById('coins').innerText = coins;
-            document.getElementById('time').innerText = timeLeft;
-            if (timeLeft > 0) {
-                timeLeft -= 1 / 60; // Assuming 60 FPS
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            player.velocityY += player.gravity;
+            player.y += player.velocityY;
+
+            // Collision detection with ground
+            if (player.y + player.height > canvas.height) {
+                player.y = canvas.height - player.height;
+                player.isJumping = false;
+                player.velocityY = 0;
             }
+
+            // Draw player and coins
+            player.draw();
+            drawCoins();
+
+            // Collision detection with coins
+            coins.forEach((coin, index) => {
+                if (player.x < coin.x + 20 && player.x + player.width > coin.x && player.y < coin.y + 20 && player.y + player.height > coin.y) {
+                    coins.splice(index, 1);
+                    score++;
+                }
+            });
+
+            requestAnimationFrame(gameLoop);
         }
 
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && player.y === canvas.height - player.height) { // Jump
-                player.dy = -10;
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight') {
+                player.x += 5;
+            } else if (event.key === 'ArrowLeft') {
+                player.x -= 5;
+            } else if (event.key === ' ' && !player.isJumping) {
+                player.velocityY = player.jumpStrength;
+                player.isJumping = true;
             }
         });
 
