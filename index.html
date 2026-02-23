@@ -3,61 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Mario Platformer</title>
+    <title>Pardon Game</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-        }
-        #game {
-            width: 800px;
-            height: 600px;
-            background: #a0e0f7;
-            position: relative;
-            overflow: hidden;
-        }
-        .player {
-            width: 30px;
-            height: 30px;
-            background: red;
-            position: absolute;
-            bottom: 50px;
-            left: 50px;
-        }
-        .block {
-            width: 50px;
-            height: 50px;
-            background: brown;
-            position: absolute;
-            bottom: 0;
-        }
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }
+        .character { font-size: 100px; }
     </style>
 </head>
 <body>
-    <div id="game">
-        <div class="player" id="player"></div>
-        <div class="block" style="left: 100px;"></div>
-        <div class="block" style="left: 200px;"></div>
-        <div class="block" style="left: 300px;"></div>
-    </div>
-    <script>
-        const player = document.getElementById('player');
-        document.addEventListener('keydown', (event) => {
-            const style = window.getComputedStyle(player);
-            let left = parseInt(style.left);
-            let bottom = parseInt(style.bottom);
-            if (event.key === 'ArrowRight') {
-                left += 10;
-            } else if (event.key === 'ArrowLeft') {
-                left -= 10;
-            } else if (event.key === 'ArrowUp') {
-                if (bottom <= 50) {
-                    bottom += 100;
-                }
-            }
-            player.style.left = left + 'px';
-            player.style.bottom = bottom + 'px';
-        });
-    </script>
+    <div class="character">👤</div>
+    <script src="game.js"></script>
 </body>
 </html>
